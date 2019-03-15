@@ -10,7 +10,7 @@ class Chip8 {
     this.vR = []
     this.iR = 0
     this.stackPointer = -1
-    this.instructionPointer = 0x200
+    this.pC = 0x200
     this.delayTimer = 60
     this.soundTimer = 60
     this.skipFlag = false
@@ -28,18 +28,17 @@ class Chip8 {
   }
 
   doCycle () {
-    let iP = this.instructionPointer
     if (this.skipFlag) {
-      iP++
+      this.pC++
       this.skipFlag = false
     }
 
-    if (iP < 0x200) {
-      console.log(`WARNING - Jumped below program memory (pointer: ${iP}).
+    if (this.pC < 0x200) {
+      console.log(`WARNING - Jumped below program memory (pointer: ${this.pC}).
   This *might* indicate a bug - or just an interesting program.`)
     }
 
-    let instruction = this.memory[iP]
+    let instruction = this.memory[this.pC]
     let opcode = instruction >>> 12
 
     switch (opcode) {
@@ -53,6 +52,8 @@ class Chip8 {
         console.log(`WARNING - ${opcode} is not a supported opcode.`)
         break
     }
+
+    this.pC++
   }
 }
 
