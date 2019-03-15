@@ -1,6 +1,6 @@
 ## Chip-8 Instructions
 
-### Supported (28/35)
+### Supported (29/35)
 
  - **0x00EE** Return from subroutine
  - **0x1NNN** Jump to NNN
@@ -32,7 +32,7 @@
  - **0x00E0** Clear Screen
  - **0xDXYN** Draw 8xN sprite at X Y from I
 
-### TODO (7/35)
+### TODO (6/35)
 
  - **0x0NNN** Call RCA1802 program at NNN (What does that mean?)
  - **0xEX9E** Skip if key in V[X] is pressed

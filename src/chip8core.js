@@ -44,6 +44,7 @@ class Chip8Core {
       }
       this.gfx.push(row)
     }
+    this.drawFunction(this.gfx)
   }
 
   loadProgram (p) {
@@ -68,6 +69,7 @@ class Chip8Core {
         this.gfx[y + r][x + c] = newVal
       }
     }
+    this.drawFunction(this.gfx)
   }
 
   doCycle () {
