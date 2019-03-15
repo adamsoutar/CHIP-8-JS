@@ -165,6 +165,38 @@ class Chip8 {
         let nn = instruction & 0x00FF
         this.vR[x3] = Math.random() * 244 + 1 & nn
         break
+      case 0xF:
+        let end = instruction & 0x00FF
+        let x4 = instruction & 0x0F00 >> 8
+
+        switch (end) {
+          case 0x07:
+            this.vR[x4] = this.delayTimer
+            break
+          case 0x15:
+            this.delayTimer = this.vR[x4]
+            break
+          case 0x18:
+            this.soundTimer = this.vR[x4]
+            break
+          case 0x1E:
+            this.iR += this.vR[x4]
+            while (this.iR > 65535) this.iR -= 65535
+            break
+          case 0x55:
+            let x5 = instruction & 0x0F00 >> 8
+            for (let i = 0; i <= x5; i++) {
+              this.memory[this.iR + i] = this.vR[i]
+            }
+            break
+          case 0x65:
+            let iN = instruction & 0x0F00 >> 8
+            for (let i = 0; i <= iN; i++) {
+              this.vR[i] = this.memory[this.iR + i]
+            }
+            break
+        }
+        break
       default:
         console.log(`WARNING - ${opcode} is not a supported opcode.`)
         break
