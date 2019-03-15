@@ -97,6 +97,34 @@ class Chip8 {
         let v = instruction & 0x0F00 >>> 8
         this.vR[v] = add8bit(this.vR[v], instruction & 0x00FF)
         break
+      case 0x8:
+        let n = instruction & 0x000F
+
+        let x = instruction & 0x0F00 >>> 8
+        let y = instruction & 0x00F0 >>> 4
+        let vX = this.vR[x]
+        let vY = this.vR[y]
+
+        switch (n) {
+          case 0:
+            this.vR[x] = vY
+            break
+          case 1:
+            this.vR[x] = vX | vY
+            break
+          case 2:
+            this.vR[x] = vX & vY
+            break
+          case 3:
+            this.vR[x] = vX ^ vY
+            break
+          case 4:
+            this.vR[x] = add8bit(vX, vY)
+            // Carry flag
+            this.vR[0xF] = (vX + vY > 255) ? 1 : 0
+            break
+        }
+        break
       default:
         console.log(`WARNING - ${opcode} is not a supported opcode.`)
         break
