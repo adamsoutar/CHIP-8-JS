@@ -1,0 +1,17 @@
+{
+  "name": "chip-8-js",
+  "version": "1.0.0",
+  "description": "A CHIP-8 emulator in JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "keywords": [
+    "chip-8"
+  ],
+  "author": "Adam Soutar",
+  "license": "MIT",
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}
