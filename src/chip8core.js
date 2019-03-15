@@ -10,8 +10,9 @@ function sub8bit (a, b) {
   return c
 }
 
-class Chip8 {
-  constructor (p) {
+class Chip8Core {
+  constructor (p, drawFunction) {
+    this.draw = drawFunction
     this.initialise()
     if (p) this.loadProgram(p)
   }
@@ -20,6 +21,7 @@ class Chip8 {
     this.memory = {}
     this.stack = []
     this.vR = []
+    this.gfx = []
     this.iR = 0
     this.stackPointer = -1
     this.pC = 0x200
@@ -29,6 +31,18 @@ class Chip8 {
 
     for (let i = 0; i < 16; i++) {
       this.vRegisters.push(0)
+    }
+    this.initialiseGraphics()
+  }
+
+  initialiseGraphics () {
+    // Fill screen with 0s
+    for (let y = 0; y < 32; y++) {
+      let row = []
+      for (let x = 0; x < 64; x++) {
+        row.push(0)
+      }
+      this.gfx.push(row)
     }
   }
 
@@ -57,7 +71,7 @@ class Chip8 {
       case 0:
         switch (instruction) {
           case 0x00E0:
-            // TODO: Clear the screen
+            this.initialiseGraphics()
             break
           case 0x00EE:
             if (this.stackPointer === -1) {
@@ -206,4 +220,4 @@ class Chip8 {
   }
 }
 
-window.Chip8 = Chip8
+window.Chip8Core = Chip8Core
