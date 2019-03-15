@@ -53,6 +53,23 @@ class Chip8Core {
     }
   }
 
+  drawSprite (x, y, n) {
+    for (let r = 0; r < n; r++) {
+      for (let c = 0; c < 8; c++) {
+        let newVal = this.program[this.iR + r] || 0
+        let oldVal = this.gfx[y + r][x + c]
+
+        if (oldVal && newVal) {
+          // Collision
+          this.vR[0xF] = 1
+          newVal = 0
+        }
+
+        this.gfx[y + r][x + c] = newVal
+      }
+    }
+  }
+
   doCycle () {
     if (this.skipFlag) {
       this.pC++
@@ -175,9 +192,16 @@ class Chip8Core {
         this.pC = -2 + instruction & 0x0FFF + this.vR[0]
         break
       case 0xC:
-        let x3 = instruction & 0x0F00
+        let x3 = instruction & 0x0F00 >> 8
         let nn = instruction & 0x00FF
         this.vR[x3] = Math.random() * 244 + 1 & nn
+        break
+      case 0xD:
+        let dX = instruction & 0x0F00 >> 8
+        let dY = instruction & 0x00F0 >> 4
+        let dN = instruction & 0x000F
+        // Draw sprite at dX, dY, 8xdN
+        this.drawSprite(dX, dY, dN)
         break
       case 0xF:
         let end = instruction & 0x00FF
