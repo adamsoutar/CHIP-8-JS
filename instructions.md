@@ -15,6 +15,7 @@
  - **0x8XY2** Set V[X] AND V[Y]
  - **0x8XY3** Set V[X] XOR V[Y]
  - **0x8XY4** Set V[X] to V[X] + V[Y] and update carry bit
+ - **0x8XY5** Set V[X] to V[X] - V[Y] and update carry bit
 
 ### TODO
 

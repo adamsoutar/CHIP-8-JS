@@ -4,6 +4,12 @@ function add8bit (a, b) {
   return c
 }
 
+function sub8bit (a, b) {
+  let c = a - b
+  while (c < 0) c += 255
+  return c
+}
+
 class Chip8 {
   constructor (p) {
     this.initialise()
@@ -57,7 +63,7 @@ class Chip8 {
             if (this.stackPointer === -1) {
               console.log(`ERROR - Return without enclosing subroutine!`)
             }
-            this.pC = this.stack[this.stackPointer]
+            this.pC = this.stack[this.stackPointer] - 1
             this.stackPointer--
             break
           default:
@@ -65,12 +71,12 @@ class Chip8 {
         }
         break
       case 0x1:
-        this.pC = instruction & 0x0FFF
+        this.pC = (instruction & 0x0FFF) - 1
         break
       case 0x2:
         this.stack.push(this.pC)
         this.stackPointer++
-        this.pC = instruction & 0x0FFF
+        this.pC = (instruction & 0x0FFF) - 1
         break
       case 0x3:
         if (
@@ -122,6 +128,11 @@ class Chip8 {
             this.vR[x] = add8bit(vX, vY)
             // Carry flag
             this.vR[0xF] = (vX + vY > 255) ? 1 : 0
+            break
+          case 5:
+            this.vR[x] = sub8bit(vX, vY)
+            // Carry flag
+            this.vR[0xF] = (vX - vY < 0) ? 0 : 1
             break
         }
         break
