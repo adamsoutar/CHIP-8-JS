@@ -8,7 +8,7 @@
  - **0x3XNN** Skip if V[X] == NN
  - **0x4XNN** Skip if V[X] != NN
  - **0x5XY0** Skip if V[X] == V[Y]
- - **0x&XNN** Set V[X] to NN
+ - **0x6XNN** Set V[X] to NN
  - **0x7XNN** Add NN to V[X] (no carry flag)
  - **0x8XY0** Set V[X] to V[Y]
  - **0x8XY1** Set V[X] OR V[Y]
