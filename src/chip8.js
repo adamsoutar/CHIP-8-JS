@@ -1,3 +1,9 @@
+function add8bit (a, b) {
+  let c = a + b
+  while (c > 255) c -= 255
+  return c
+}
+
 class Chip8 {
   constructor (p) {
     this.initialise()
@@ -86,6 +92,10 @@ class Chip8 {
         break
       case 0x6:
         this.vR[instruction & 0x0F00 >>> 8] = instruction & 0x00FF
+        break
+      case 0x7:
+        let v = instruction & 0x0F00 >>> 8
+        this.vR[v] = add8bit(this.vR[v], instruction & 0x00FF)
         break
       default:
         console.log(`WARNING - ${opcode} is not a supported opcode.`)
