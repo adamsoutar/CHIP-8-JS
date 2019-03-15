@@ -22,7 +22,13 @@
  - **0x9XY0** Skip if V[X] != V[Y]
  - **0xANNN** Set I to NNN
  - **0xBNNN** Jump to NNN + V0
- - **0xCXNN** V[X] = rand(0, 255) AND NN 
+ - **0xCXNN** V[X] = rand(0, 255) AND NN
+ - **0xFX07** V[X] = delay timer
+ - **0xFX15** delay timer = V[X]
+ - **0xFX18** sound timer = V[X]
+ - **0xFX1E** Add V[X] to i
+ - **0xFX55** Copy V0 to V[X] (inc) into i onwards
+ - **0xFX65** Copy i to i + X into V0 onwards
 
 ### TODO
 
