@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='../src/chip8core.js'></script>
+    <script src='../src/chip8canvas.js'></script>
+    <style>
+      html, body {
+        background-color: black;
+      }
+      #cnv {
+        position: fixed;
+        top: calc(50% - 125px);
+        left: calc(50% - 250px);
+        border: 1px solid white;
+      }
+    </style>
+  </head>
+  <body>
+    <input type='file' onChange='loadProgram(this)' />
+    <canvas id='cnv' width='500' height='250'></canvas>
+    <script>
+      let myChip8
+      document.addEventListener('DOMContentLoaded', (event) => {
+        myChip8 = new Chip8Canvas(document.getElementById('cnv'))
+      })
+
+      function loadProgram (f) {
+        let rom = f.files[0]
+        let reader = new FileReader()
+        reader.onloadend = () => {
+          myChip8.core.loadProgram(Array.from(new Uint8Array(reader.result)))
+          myChip8.core.start()
+        }
+        reader.readAsArrayBuffer(rom)
+      }
+    </script>
+  </body>
+</html>

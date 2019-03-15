@@ -30,9 +30,8 @@ function sub8bit (a, b) {
 }
 
 class Chip8Core {
-  constructor (p, drawFunction) {
-    this.draw = drawFunction
-    this.initialise()
+  constructor (drawFunction, p) {
+    this.drawFunction = drawFunction
     if (p) this.loadProgram(p)
   }
 
@@ -49,7 +48,7 @@ class Chip8Core {
     this.skipFlag = false
 
     for (let i = 0; i < 16; i++) {
-      this.vRegisters.push(0)
+      this.vR.push(0)
     }
 
     // Copy font into memory
@@ -58,6 +57,13 @@ class Chip8Core {
     }
 
     this.initialiseGraphics()
+  }
+
+  start () {
+    setInterval(() => {
+      // TODO: Keys
+      this.doCycle()
+    }, 16)
   }
 
   initialiseGraphics () {
@@ -73,19 +79,28 @@ class Chip8Core {
   }
 
   loadProgram (p) {
+    this.initialise()
     // Load programs from 0x200 onwards
     for (let i = 0; i < p.length; i++) {
-      this.memory[0x200 + i] = p[i]
+      this.memory[0x200 + i] = Number(p[i])
     }
+  }
+
+  getAlong (num, along) {
+    num = num || 0
+    num = num >> (3 - along)
+    num = num & 1
+    return num
   }
 
   drawSprite (x, y, n) {
     for (let r = 0; r < n; r++) {
       for (let c = 0; c < 8; c++) {
-        let newVal = this.program[this.iR + r] || 0
+        let newVal = this.getAlong(this.memory[this.iR + r], c)
         let oldVal = this.gfx[y + r][x + c]
 
         if (oldVal && newVal) {
+          console.log(`XOR for ${oldVal} && ${newVal}`)
           // Collision
           this.vR[0xF] = 1
           newVal = 0
@@ -101,6 +116,14 @@ class Chip8Core {
     if (this.skipFlag) {
       this.pC++
       this.skipFlag = false
+    }
+
+    this.delayTimer--
+    this.soundTimer--
+    if (this.delayTimer === 0) this.delayTimer = 60
+    if (this.soundTimer === 0) {
+      this.soundTimer = 60
+      console.log('Chip 8 says BEEP!')
     }
 
     if (this.pC < 0x200) {
@@ -203,7 +226,7 @@ class Chip8Core {
             break
           case 0xE:
             this.vR[0xF] = vX & 0x8
-            this.vR <<= 1
+            this.vR[x] <<= 1
             break
         }
         break
