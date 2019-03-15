@@ -19,6 +19,10 @@
  - **0x8XY6** Set VF to V[X]'s least significant bit, then right shift V[X]
  - **0x8XY7** Set V[X] to V[Y] - V[X]
  - **0x8XYE** Set VF to V[X]'s most significant bit, then left shift V[X]
+ - **0x9XY0** Skip if V[X] != V[Y]
+ - **0xANNN** Set I to NNN
+ - **0xBNNN** Jump to NNN + V0
+ - **0xCXNN** V[X] = rand(0, 255) AND NN 
 
 ### TODO
 

@@ -54,7 +54,7 @@ class Chip8 {
     let opcode = instruction >> 12
 
     switch (opcode) {
-      case 0x0:
+      case 0:
         switch (instruction) {
           case 0x00E0:
             // TODO: Clear the screen
@@ -70,40 +70,40 @@ class Chip8 {
             console.log('WARNING - The 0x0NNN instruction is not supported')
         }
         break
-      case 0x1:
+      case 1:
         this.pC = (instruction & 0x0FFF) - 2
         break
-      case 0x2:
+      case 2:
         this.stack.push(this.pC)
         this.stackPointer++
         this.pC = (instruction & 0x0FFF) - 2
         break
-      case 0x3:
+      case 3:
         if (
           this.vR[instruction & 0x0F00 >> 8] ===
           instruction & 0x00FF
         ) this.skipFlag = true
         break
-      case 0x4:
+      case 4:
         if (
           this.vR[instruction & 0x0F00 >> 8] !==
           instruction & 0x00FF
         ) this.skipFlag = true
         break
-      case 0x5:
+      case 5:
         if (
           this.vR[instruction & 0x0F00 >> 8] ===
           this.vR[instruction & 0x00F0 >> 4]
         ) this.skipFlag = true
         break
-      case 0x6:
+      case 6:
         this.vR[instruction & 0x0F00 >> 8] = instruction & 0x00FF
         break
-      case 0x7:
+      case 7:
         let v = instruction & 0x0F00 >> 8
         this.vR[v] = add8bit(this.vR[v], instruction & 0x00FF)
         break
-      case 0x8:
+      case 8:
         let n = instruction & 0x000F
 
         let x = instruction & 0x0F00 >> 8
@@ -148,6 +148,22 @@ class Chip8 {
             this.vR <<= 1
             break
         }
+        break
+      case 9:
+        let x2 = instruction & 0x0F00 >> 8
+        let y2 = instruction & 0x00F0 >> 4
+        if (this.vR[x2] !== this.vR[y2]) this.skipFlag = true
+        break
+      case 0xA:
+        this.iR = instruction & 0x0FFF
+        break
+      case 0xB:
+        this.pC = -2 + instruction & 0x0FFF + this.vR[0]
+        break
+      case 0xC:
+        let x3 = instruction & 0x0F00
+        let nn = instruction & 0x00FF
+        this.vR[x3] = Math.random() * 244 + 1 & nn
         break
       default:
         console.log(`WARNING - ${opcode} is not a supported opcode.`)
