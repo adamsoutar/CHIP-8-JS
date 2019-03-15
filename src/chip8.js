@@ -51,7 +51,7 @@ class Chip8 {
     }
 
     let instruction = this.memory[this.pC] << 8 | this.memory[this.pC + 1]
-    let opcode = instruction >>> 12
+    let opcode = instruction >> 12
 
     switch (opcode) {
       case 0x0:
@@ -80,34 +80,34 @@ class Chip8 {
         break
       case 0x3:
         if (
-          this.vR[instruction & 0x0F00 >>> 8] ===
+          this.vR[instruction & 0x0F00 >> 8] ===
           instruction & 0x00FF
         ) this.skipFlag = true
         break
       case 0x4:
         if (
-          this.vR[instruction & 0x0F00 >>> 8] !==
+          this.vR[instruction & 0x0F00 >> 8] !==
           instruction & 0x00FF
         ) this.skipFlag = true
         break
       case 0x5:
         if (
-          this.vR[instruction & 0x0F00 >>> 8] ===
-          this.vR[instruction & 0x00F0 >>> 4]
+          this.vR[instruction & 0x0F00 >> 8] ===
+          this.vR[instruction & 0x00F0 >> 4]
         ) this.skipFlag = true
         break
       case 0x6:
-        this.vR[instruction & 0x0F00 >>> 8] = instruction & 0x00FF
+        this.vR[instruction & 0x0F00 >> 8] = instruction & 0x00FF
         break
       case 0x7:
-        let v = instruction & 0x0F00 >>> 8
+        let v = instruction & 0x0F00 >> 8
         this.vR[v] = add8bit(this.vR[v], instruction & 0x00FF)
         break
       case 0x8:
         let n = instruction & 0x000F
 
-        let x = instruction & 0x0F00 >>> 8
-        let y = instruction & 0x00F0 >>> 4
+        let x = instruction & 0x0F00 >> 8
+        let y = instruction & 0x00F0 >> 4
         let vX = this.vR[x]
         let vY = this.vR[y]
 
@@ -133,6 +133,19 @@ class Chip8 {
             this.vR[x] = sub8bit(vX, vY)
             // Carry flag
             this.vR[0xF] = (vX - vY < 0) ? 0 : 1
+            break
+          case 6:
+            this.vR[0xF] = vX & 0x1
+            this.vR[x] >>= 1
+            break
+          case 7:
+            this.vR[x] = sub8bit(vY, vX)
+            // Carry flag
+            this.vR[0xF] = (vY - vX < 0) ? 1 : 0
+            break
+          case 0xE:
+            this.vR[0xF] = vX & 0x8
+            this.vR <<= 1
             break
         }
         break
