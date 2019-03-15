@@ -50,7 +50,7 @@ class Chip8 {
   This *might* indicate a bug - or just an interesting program.`)
     }
 
-    let instruction = this.memory[this.pC]
+    let instruction = this.memory[this.pC] << 8 | this.memory[this.pC + 1]
     let opcode = instruction >>> 12
 
     switch (opcode) {
@@ -63,7 +63,7 @@ class Chip8 {
             if (this.stackPointer === -1) {
               console.log(`ERROR - Return without enclosing subroutine!`)
             }
-            this.pC = this.stack[this.stackPointer] - 1
+            this.pC = this.stack[this.stackPointer] - 2
             this.stackPointer--
             break
           default:
@@ -71,12 +71,12 @@ class Chip8 {
         }
         break
       case 0x1:
-        this.pC = (instruction & 0x0FFF) - 1
+        this.pC = (instruction & 0x0FFF) - 2
         break
       case 0x2:
         this.stack.push(this.pC)
         this.stackPointer++
-        this.pC = (instruction & 0x0FFF) - 1
+        this.pC = (instruction & 0x0FFF) - 2
         break
       case 0x3:
         if (
@@ -141,7 +141,7 @@ class Chip8 {
         break
     }
 
-    this.pC++
+    this.pC += 2
   }
 }
 
