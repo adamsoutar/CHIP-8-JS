@@ -42,11 +42,29 @@ class Chip8 {
     let opcode = instruction >>> 12
 
     switch (opcode) {
+      case 0x1:
+        this.pC = instruction & 0x0FFF
+        break
       case 0x3:
         if (
           this.vR[instruction & 0x0F00 >>> 8] ===
           instruction & 0x00FF
         ) this.skipFlag = true
+        break
+      case 0x4:
+        if (
+          this.vR[instruction & 0x0F00 >>> 8] !==
+          instruction & 0x00FF
+        ) this.skipFlag = true
+        break
+      case 0x5:
+        if (
+          this.vR[instruction & 0x0F00 >>> 8] ===
+          this.vR[instruction & 0x00F0 >>> 4]
+        ) this.skipFlag = true
+        break
+      case 0x6:
+        this.vR[instruction & 0x0F00 >>> 8] = instruction & 0x00FF
         break
       default:
         console.log(`WARNING - ${opcode} is not a supported opcode.`)
