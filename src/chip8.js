@@ -42,7 +42,28 @@ class Chip8 {
     let opcode = instruction >>> 12
 
     switch (opcode) {
+      case 0x0:
+        switch (instruction) {
+          case 0x00E0:
+            // TODO: Clear the screen
+            break
+          case 0x00EE:
+            if (this.stackPointer === -1) {
+              console.log(`ERROR - Return without enclosing subroutine!`)
+            }
+            this.pC = this.stack[this.stackPointer]
+            this.stackPointer--
+            break
+          default:
+            console.log('WARNING - The 0x0NNN instruction is not supported')
+        }
+        break
       case 0x1:
+        this.pC = instruction & 0x0FFF
+        break
+      case 0x2:
+        this.stack.push(this.pC)
+        this.stackPointer++
         this.pC = instruction & 0x0FFF
         break
       case 0x3:
