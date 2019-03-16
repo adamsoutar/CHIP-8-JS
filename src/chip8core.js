@@ -21,6 +21,13 @@ function numToInstruction (n) {
   return `0x${n.toString(16).toUpperCase()}`
 }
 
+function getAlong (num, along) {
+  num = num || 0
+  num = num >> (7 - along)
+  num = num & 1
+  return num
+}
+
 function add8bit (a, b) {
   let c = a + b
   while (c > 255) c -= 255
@@ -90,19 +97,11 @@ class Chip8Core {
     }
   }
 
-  getAlong (num, along) {
-    num = num || 0
-    num = num >> (3 - along)
-    num = num & 1
-    return num
-  }
-
   drawSprite (x, y, n) {
     /* THIS DRAW FUNCTION IS BROKEN! FIX IT!!! */
-    console.log(`Draw op 8x${n} at [${x}, ${y}]`)
     for (let r = 0; r < n; r++) {
       for (let c = 0; c < 8; c++) {
-        let newVal = this.getAlong(this.memory[this.iR + r], c)
+        let newVal = getAlong(this.memory[this.iR + r], c)
         let oldVal = this.gfx[y + r][x + c]
 
         // console.log(`Draw op for [${x + c}, ${y + r}], from ${oldVal} to ${newVal} PRE-XOR`)
@@ -147,7 +146,7 @@ class Chip8Core {
     let instruction = (this.memory[this.pC] << 8) | this.memory[this.pC + 1]
     let opcode = instruction >> 12
 
-    console.log(`DEBUG - ${numToInstruction(instruction)} at ${this.pC}`)
+    // console.log(`DEBUG - ${numToInstruction(instruction)} at ${this.pC}`)
 
     switch (opcode) {
       case 0:
