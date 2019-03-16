@@ -9,15 +9,15 @@
       }
       #cnv {
         position: fixed;
-        top: calc(50% - 125px);
-        left: calc(50% - 250px);
+        top: calc(50% - 250px);
+        left: calc(50% - 500px);
         border: 1px solid white;
       }
     </style>
   </head>
   <body>
     <input type='file' onChange='loadProgram(this)' />
-    <canvas id='cnv' width='500' height='250'></canvas>
+    <canvas id='cnv' width='1000' height='500'></canvas>
     <script>
       let myChip8
       document.addEventListener('DOMContentLoaded', (event) => {

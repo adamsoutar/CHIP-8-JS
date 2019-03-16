@@ -42,6 +42,7 @@ function sub8bit (a, b) {
 
 class Chip8Core {
   constructor (drawFunction, p) {
+    this.breakpoints = []
     this.drawFunction = drawFunction
     if (p) this.loadProgram(p)
   }
@@ -54,8 +55,8 @@ class Chip8Core {
     this.iR = 0
     this.stackPointer = -1
     this.pC = 0x200
-    this.delayTimer = 60
-    this.soundTimer = 60
+    this.delayTimer = 0
+    this.soundTimer = 0
     this.skipFlag = false
 
     for (let i = 0; i < 16; i++) {
@@ -72,9 +73,14 @@ class Chip8Core {
 
   start () {
     setInterval(() => {
+      // Do registers
+      if (this.soundTimer > 0) this.soundTimer--
+      if (this.delayTimer > 0) this.delayTimer--
+    }, 16)
+    setInterval(() => {
       // TODO: Keys
       this.doCycle()
-    }, 16)
+    }, 0)
   }
 
   initialiseGraphics () {
@@ -98,11 +104,16 @@ class Chip8Core {
   }
 
   drawSprite (x, y, n) {
-    /* THIS DRAW FUNCTION IS BROKEN! FIX IT!!! */
     for (let r = 0; r < n; r++) {
       for (let c = 0; c < 8; c++) {
         let newVal = getAlong(this.memory[this.iR + r], c)
-        let oldVal = this.gfx[y + r][x + c]
+
+        let xAddr = x + c
+        let yAddr = y + r
+        while (xAddr > 63) xAddr -= 64
+        while (yAddr > 31) yAddr -= 32
+
+        let oldVal = this.gfx[yAddr][xAddr]
 
         // console.log(`Draw op for [${x + c}, ${y + r}], from ${oldVal} to ${newVal} PRE-XOR`)
 
@@ -112,7 +123,7 @@ class Chip8Core {
           newVal = 0
         }
 
-        this.gfx[y + r][x + c] = newVal
+        this.gfx[yAddr][xAddr] = newVal
       }
     }
     this.drawFunction(this.gfx)
@@ -120,16 +131,8 @@ class Chip8Core {
 
   doCycle () {
     if (this.skipFlag) {
-      this.pC++
+      this.pC += 2
       this.skipFlag = false
-    }
-
-    this.delayTimer--
-    this.soundTimer--
-    if (this.delayTimer === 0) this.delayTimer = 60
-    if (this.soundTimer === 0) {
-      this.soundTimer = 60
-      console.log('Chip 8 says BEEP!')
     }
 
     if (this.pC < 0x200) {
@@ -145,6 +148,10 @@ class Chip8Core {
 
     let instruction = (this.memory[this.pC] << 8) | this.memory[this.pC + 1]
     let opcode = instruction >> 12
+
+    if (this.breakpoints.includes(this.pC)) {
+      debugger
+    }
 
     // console.log(`DEBUG - ${numToInstruction(instruction)} at ${this.pC}`)
 
@@ -176,13 +183,13 @@ class Chip8Core {
       case 3:
         if (
           this.vR[(instruction & 0x0F00) >> 8] ===
-          instruction & 0x00FF
+          (instruction & 0x00FF)
         ) this.skipFlag = true
         break
       case 4:
         if (
           this.vR[(instruction & 0x0F00) >> 8] !==
-          instruction & 0x00FF
+          (instruction & 0x00FF)
         ) this.skipFlag = true
         break
       case 5:
@@ -258,7 +265,7 @@ class Chip8Core {
       case 0xC:
         let x3 = (instruction & 0x0F00) >> 8
         let nn = instruction & 0x00FF
-        this.vR[x3] = Math.random() * 244 + 1 & nn
+        this.vR[x3] = (Math.random() * 244 + 1) & nn
         break
       case 0xD:
         let dX = (instruction & 0x0F00) >> 8
@@ -288,6 +295,12 @@ class Chip8Core {
           case 0x29:
             this.iR = this.vR[x4] * 5
             break
+          case 0x33:
+            let s = String(this.vR[x4])
+            this.memory[this.iR] = s[0]
+            this.memory[this.iR + 1] = s[1]
+            this.memory[this.iR + 2] = s[2]
+            break
           case 0x55:
             let x5 = (instruction & 0x0F00) >> 8
             for (let i = 0; i <= x5; i++) {
@@ -300,6 +313,8 @@ class Chip8Core {
               this.vR[i] = this.memory[this.iR + i]
             }
             break
+          default:
+            console.log(`WARNING - The 0xF code ${numToInstruction(instruction)} is not supported`)
         }
         break
       default:

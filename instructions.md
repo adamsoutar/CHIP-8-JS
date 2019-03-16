@@ -1,6 +1,6 @@
 ## Chip-8 Instructions
 
-### Supported (30/35)
+### Supported (31/35)
 
  - **0x00EE** Return from subroutine
  - **0x1NNN** Jump to NNN
@@ -32,14 +32,14 @@
  - **0x00E0** Clear Screen
  - **0xDXYN** Draw 8xN sprite at X Y from I
  - **0xFX29** Set I to font set location for char in V[X]
+ - **0xFX33** V[X] hundreds column to i, tens to i + 1, units to i + 2
 
-### TODO (5/35)
+### TODO (4/35)
 
  - **0x0NNN** Call RCA1802 program at NNN (What does that mean?)
  - **0xEX9E** Skip if key in V[X] is pressed
  - **0xEXA1** Skip if key in V[X] isn't pressed
  - **0xFX0A** Halt until a key is pressed, then store it in V[X]
- - **0xFX33** I don't understand *in the slightest* what this does
 
 
 https://en.wikipedia.org/wiki/CHIP-8

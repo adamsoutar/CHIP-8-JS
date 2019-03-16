@@ -1,7 +1,5 @@
 class Chip8Canvas {
   constructor (canvas, program) {
-    console.log('Hello, world!')
-    console.log(this.draw)
     this.core = new window.Chip8Core(this.draw.bind(this), program)
     this.canvas = canvas
     this.ctx = canvas.getContext('2d')
