@@ -175,9 +175,10 @@ class Chip8Core {
 
         let xAddr = x + c
         let yAddr = y + r
+
         // Screen wrap - does it do this?
-        // while (xAddr > 63) xAddr -= 64
-        // while (yAddr > 31) yAddr -= 32
+        while (xAddr > 63) xAddr -= 64
+        while (yAddr > 31) yAddr -= 32
 
         let oldVal = this.gfx[yAddr][xAddr]
 
@@ -186,7 +187,6 @@ class Chip8Core {
         if (oldVal && newVal) {
           // Collision
           this.vR[0xF] = 1
-          newVal = 0
         }
 
         this.gfx[yAddr][xAddr] = newVal ^ oldVal
@@ -224,7 +224,7 @@ class Chip8Core {
       debugger
     }
 
-    // console.log(`DEBUG - ${numToInstruction(instruction)} at ${this.pC}`)
+    // console.log(`DEBUG - ${this.pC} - ${numToInstruction(instruction)}`)
 
     switch (opcode) {
       case 0:
