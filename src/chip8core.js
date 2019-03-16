@@ -299,10 +299,10 @@ class Chip8Core {
           case 7:
             this.vR[x] = sub8bit(vY, vX)
             // Carry flag
-            this.vR[0xF] = (vY - vX < 0) ? 1 : 0
+            this.vR[0xF] = (vY - vX < 0) ? 0 : 1
             break
           case 0xE:
-            this.vR[0xF] = vX & 0x8
+            this.vR[0xF] = (vX & 0x80) >> 7
             this.vR[x] <<= 1
             break
         }
@@ -366,9 +366,9 @@ class Chip8Core {
             break
           case 0x33:
             let s = String(this.vR[x4])
-            this.memory[this.iR] = s[0]
-            this.memory[this.iR + 1] = s[1]
-            this.memory[this.iR + 2] = s[2]
+            this.memory[this.iR] = parseInt(s[0])
+            this.memory[this.iR + 1] = parseInt(s[1])
+            this.memory[this.iR + 2] = parseInt(s[2])
             break
           case 0x55:
             let x5 = (instruction & 0x0F00) >> 8
