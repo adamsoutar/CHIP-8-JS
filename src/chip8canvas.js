@@ -7,7 +7,6 @@ class Chip8Canvas {
 
   draw (gfx) {
     let blockSize = this.canvas.height / 32
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
     for (let y = 0; y < gfx.length; y++) {
       for (let x = 0; x < gfx.length; x++) {

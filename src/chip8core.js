@@ -58,9 +58,20 @@ function sub8bit (a, b) {
   return c
 }
 
+function zeroPadd (a) {
+  if (a.length === 1) {
+    a = `0${a}`
+  }
+  if (a.length === 2) {
+    a = `0${a}`
+  }
+  return a
+}
+
 class Chip8Core {
   constructor (drawFunction, p) {
     this.breakpoints = []
+    this.breakInstructions = []
 
     this.keystates = {}
     // Prepare keystates
@@ -178,7 +189,7 @@ class Chip8Core {
           newVal = 0
         }
 
-        this.gfx[yAddr][xAddr] = newVal
+        this.gfx[yAddr][xAddr] = newVal ^ oldVal
       }
     }
     this.drawFunction(this.gfx)
@@ -204,7 +215,11 @@ class Chip8Core {
     let instruction = (this.memory[this.pC] << 8) | this.memory[this.pC + 1]
     let opcode = instruction >> 12
 
-    if (this.breakpoints.includes(this.pC)) {
+    if (
+      this.breakpoints.includes(this.pC) ||
+      this.breakInstructions.includes(this.opcode)
+    ) {
+      console.log(`Breaking`)
       // eslint-disable-next-line
       debugger
     }
@@ -365,7 +380,7 @@ class Chip8Core {
             this.iR = this.vR[x4] * 5
             break
           case 0x33:
-            let s = String(this.vR[x4])
+            let s = zeroPadd(String(this.vR[x4]))
             this.memory[this.iR] = parseInt(s[0])
             this.memory[this.iR + 1] = parseInt(s[1])
             this.memory[this.iR + 2] = parseInt(s[2])
