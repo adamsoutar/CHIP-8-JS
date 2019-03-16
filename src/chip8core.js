@@ -16,6 +16,24 @@ const font = [
   0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
   0xF0, 0x80, 0xF0, 0x80, 0x80 //  F
 ]
+const keymap = {
+  '0': 'X',
+  '1': '1',
+  '2': '2',
+  '3': '4',
+  '4': 'Q',
+  '5': 'W',
+  '6': 'E',
+  '7': 'A',
+  '8': 'S',
+  '9': 'D',
+  A: 'Z',
+  B: 'C',
+  C: '4',
+  D: 'R',
+  E: 'F',
+  F: 'V'
+}
 
 function numToInstruction (n) {
   return `0x${n.toString(16).toUpperCase()}`
@@ -43,8 +61,38 @@ function sub8bit (a, b) {
 class Chip8Core {
   constructor (drawFunction, p) {
     this.breakpoints = []
+
+    this.keystates = {}
+    // Prepare keystates
+    for (let oK of Object.keys(keymap)) {
+      this.keystates[oK] = false
+    }
+
     this.drawFunction = drawFunction
     if (p) this.loadProgram(p)
+
+    // Add keymap listeners
+    document.addEventListener('keydown', (e) => {
+      for (let oK of Object.keys(keymap)) {
+        if (keymap[oK] === e.key.toUpperCase()) {
+          this.keystates[oK] = true
+          if (this.waitFlag) {
+            this.waitFlag = false
+            this.vR[this.keyWaitRegister] = parseInt(oK, 16)
+            this.start()
+          }
+          return
+        }
+      }
+    })
+    document.addEventListener('keyup', (e) => {
+      for (let oK of Object.keys(keymap)) {
+        if (keymap[oK] === e.key) {
+          this.keystates[oK] = false
+          return
+        }
+      }
+    })
   }
 
   initialise () {
@@ -58,6 +106,8 @@ class Chip8Core {
     this.delayTimer = 0
     this.soundTimer = 0
     this.skipFlag = false
+    this.waitFlag = false
+    this.keyWaitRegister = 0
 
     for (let i = 0; i < 16; i++) {
       this.vR.push(0)
@@ -72,15 +122,19 @@ class Chip8Core {
   }
 
   start () {
-    setInterval(() => {
+    this.timerTimer = setInterval(() => {
       // Do registers
       if (this.soundTimer > 0) this.soundTimer--
       if (this.delayTimer > 0) this.delayTimer--
     }, 16)
-    setInterval(() => {
-      // TODO: Keys
+    this.cycleTimer = setInterval(() => {
       this.doCycle()
     }, 0)
+  }
+
+  stop () {
+    clearInterval(this.timerTimer)
+    clearInterval(this.cycleTimer)
   }
 
   initialiseGraphics () {
@@ -110,8 +164,9 @@ class Chip8Core {
 
         let xAddr = x + c
         let yAddr = y + r
-        while (xAddr > 63) xAddr -= 64
-        while (yAddr > 31) yAddr -= 32
+        // Screen wrap - does it do this?
+        // while (xAddr > 63) xAddr -= 64
+        // while (yAddr > 31) yAddr -= 32
 
         let oldVal = this.gfx[yAddr][xAddr]
 
@@ -150,6 +205,7 @@ class Chip8Core {
     let opcode = instruction >> 12
 
     if (this.breakpoints.includes(this.pC)) {
+      // eslint-disable-next-line
       debugger
     }
 
@@ -165,7 +221,7 @@ class Chip8Core {
             if (this.stackPointer === -1) {
               console.log(`ERROR - Return without enclosing subroutine!`)
             }
-            this.pC = this.stack[this.stackPointer] - 2
+            this.pC = this.stack[this.stackPointer]
             this.stackPointer--
             break
           default:
@@ -274,6 +330,19 @@ class Chip8Core {
         // Draw sprite at dX, dY, 8xdN
         this.drawSprite(this.vR[dX], this.vR[dY], dN)
         break
+      case 0xE:
+        let end2 = instruction & 0x00FF
+        let x6 = (instruction & 0x0F00) >> 8
+        let key = this.keystates[this.vR[x6]]
+        switch (end2) {
+          case 0x9E:
+            if (key) this.skipFlag = true
+            break
+          case 0xA1:
+            if (!key) this.skipFlag = true
+            break
+        }
+        break
       case 0xF:
         let end = instruction & 0x00FF
         let x4 = (instruction & 0x0F00) >> 8
@@ -313,8 +382,12 @@ class Chip8Core {
               this.vR[i] = this.memory[this.iR + i]
             }
             break
-          default:
-            console.log(`WARNING - The 0xF code ${numToInstruction(instruction)} is not supported`)
+          case 0x0A:
+            this.stop()
+            this.waitFlag = true
+            let x7 = (instruction & 0x0F00) >> 8
+            this.keyWaitRegister = x7
+            break
         }
         break
       default:
