@@ -14,7 +14,7 @@ class Chip8Canvas {
     for (let y = 0; y < gfx.length; y++) {
       for (let x = 0; x < gfx.length; x++) {
         this.ctx.fillStyle = gfx[y][x] ? 'white' : 'black'
-        this.ctx.fillRect(x, y, blockSize, blockSize)
+        this.ctx.fillRect(x * blockSize, y * blockSize, blockSize, blockSize)
       }
     }
   }

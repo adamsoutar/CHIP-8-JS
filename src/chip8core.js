@@ -17,6 +17,10 @@ const font = [
   0xF0, 0x80, 0xF0, 0x80, 0x80 //  F
 ]
 
+function numToInstruction (n) {
+  return `0x${n.toString(16).toUpperCase()}`
+}
+
 function add8bit (a, b) {
   let c = a + b
   while (c > 255) c -= 255
@@ -94,13 +98,16 @@ class Chip8Core {
   }
 
   drawSprite (x, y, n) {
+    /* THIS DRAW FUNCTION IS BROKEN! FIX IT!!! */
+    console.log(`Draw op 8x${n} at [${x}, ${y}]`)
     for (let r = 0; r < n; r++) {
       for (let c = 0; c < 8; c++) {
         let newVal = this.getAlong(this.memory[this.iR + r], c)
         let oldVal = this.gfx[y + r][x + c]
 
+        // console.log(`Draw op for [${x + c}, ${y + r}], from ${oldVal} to ${newVal} PRE-XOR`)
+
         if (oldVal && newVal) {
-          console.log(`XOR for ${oldVal} && ${newVal}`)
           // Collision
           this.vR[0xF] = 1
           newVal = 0
@@ -131,8 +138,16 @@ class Chip8Core {
   This *might* indicate a bug - or just an interesting program.`)
     }
 
-    let instruction = this.memory[this.pC] << 8 | this.memory[this.pC + 1]
+    if (!Object.keys(this.memory).includes(String(this.pC))) {
+      // The program counter is outside the memory,
+      // there is no instruction here
+      return
+    }
+
+    let instruction = (this.memory[this.pC] << 8) | this.memory[this.pC + 1]
     let opcode = instruction >> 12
+
+    console.log(`DEBUG - ${numToInstruction(instruction)} at ${this.pC}`)
 
     switch (opcode) {
       case 0:
@@ -161,34 +176,34 @@ class Chip8Core {
         break
       case 3:
         if (
-          this.vR[instruction & 0x0F00 >> 8] ===
+          this.vR[(instruction & 0x0F00) >> 8] ===
           instruction & 0x00FF
         ) this.skipFlag = true
         break
       case 4:
         if (
-          this.vR[instruction & 0x0F00 >> 8] !==
+          this.vR[(instruction & 0x0F00) >> 8] !==
           instruction & 0x00FF
         ) this.skipFlag = true
         break
       case 5:
         if (
-          this.vR[instruction & 0x0F00 >> 8] ===
-          this.vR[instruction & 0x00F0 >> 4]
+          this.vR[(instruction & 0x0F00) >> 8] ===
+          this.vR[(instruction & 0x00F0) >> 4]
         ) this.skipFlag = true
         break
       case 6:
-        this.vR[instruction & 0x0F00 >> 8] = instruction & 0x00FF
+        this.vR[(instruction & 0x0F00) >> 8] = instruction & 0x00FF
         break
       case 7:
-        let v = instruction & 0x0F00 >> 8
+        let v = (instruction & 0x0F00) >> 8
         this.vR[v] = add8bit(this.vR[v], instruction & 0x00FF)
         break
       case 8:
         let n = instruction & 0x000F
 
-        let x = instruction & 0x0F00 >> 8
-        let y = instruction & 0x00F0 >> 4
+        let x = (instruction & 0x0F00) >> 8
+        let y = (instruction & 0x00F0) >> 4
         let vX = this.vR[x]
         let vY = this.vR[y]
 
@@ -231,31 +246,31 @@ class Chip8Core {
         }
         break
       case 9:
-        let x2 = instruction & 0x0F00 >> 8
-        let y2 = instruction & 0x00F0 >> 4
+        let x2 = (instruction & 0x0F00) >> 8
+        let y2 = (instruction & 0x00F0) >> 4
         if (this.vR[x2] !== this.vR[y2]) this.skipFlag = true
         break
       case 0xA:
         this.iR = instruction & 0x0FFF
         break
       case 0xB:
-        this.pC = -2 + instruction & 0x0FFF + this.vR[0]
+        this.pC = -2 + (instruction & 0x0FFF) + this.vR[0]
         break
       case 0xC:
-        let x3 = instruction & 0x0F00 >> 8
+        let x3 = (instruction & 0x0F00) >> 8
         let nn = instruction & 0x00FF
         this.vR[x3] = Math.random() * 244 + 1 & nn
         break
       case 0xD:
-        let dX = instruction & 0x0F00 >> 8
-        let dY = instruction & 0x00F0 >> 4
+        let dX = (instruction & 0x0F00) >> 8
+        let dY = (instruction & 0x00F0) >> 4
         let dN = instruction & 0x000F
         // Draw sprite at dX, dY, 8xdN
-        this.drawSprite(dX, dY, dN)
+        this.drawSprite(this.vR[dX], this.vR[dY], dN)
         break
       case 0xF:
         let end = instruction & 0x00FF
-        let x4 = instruction & 0x0F00 >> 8
+        let x4 = (instruction & 0x0F00) >> 8
 
         switch (end) {
           case 0x07:
@@ -275,13 +290,13 @@ class Chip8Core {
             this.iR = this.vR[x4] * 5
             break
           case 0x55:
-            let x5 = instruction & 0x0F00 >> 8
+            let x5 = (instruction & 0x0F00) >> 8
             for (let i = 0; i <= x5; i++) {
               this.memory[this.iR + i] = this.vR[i]
             }
             break
           case 0x65:
-            let iN = instruction & 0x0F00 >> 8
+            let iN = (instruction & 0x0F00) >> 8
             for (let i = 0; i <= iN; i++) {
               this.vR[i] = this.memory[this.iR + i]
             }
@@ -289,7 +304,7 @@ class Chip8Core {
         }
         break
       default:
-        console.log(`WARNING - ${opcode} is not a supported opcode.`)
+        console.log(`WARNING - ${numToInstruction(opcode)} is not a supported opcode.`)
         break
     }
 
