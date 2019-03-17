@@ -56,4 +56,25 @@ module.exports = (core) => {
 
     assert(core.iR === 0xFFF)
   })
+
+  it('0xCXNN', function () {
+    core.loadProgram([
+      0xC0, 0b10101010
+    ]).runToEndSync()
+
+    // Ensure it followed the mask
+    assert((core.vR[0] & 0b01010101) === 0)
+  })
+
+  it('0xFX07 & 0xFX15', function () {
+    core.loadProgram([
+      0xF0, 7,
+      0x61, 30,
+      0xF1, 0x15,
+      0xF2, 7
+    ]).runToEndSync()
+
+    assert(core.vR[0] === 0)
+    assert(core.vR[2] === 30)
+  })
 }

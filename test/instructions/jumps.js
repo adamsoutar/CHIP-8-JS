@@ -86,7 +86,7 @@ module.exports = (core) => {
       0xB2, 0x00,
       0x61, 0x01
     ]).runToEndSync()
-console.log(core.vR[0])
+    
     assert(core.vR[1] === 0)
     assert(core.pC === 0x206)
   })
