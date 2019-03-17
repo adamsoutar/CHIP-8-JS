@@ -2,7 +2,7 @@
 
 Test instructions aren't labelled to save repetition, see ```/src/instructions.md``` or wikipedia's article on CHIP-8
 
-### Instructions covered by tests (0/34)
+### Instructions covered by tests (13/34)
 
 ##### Drawing
  - **0x00E0**
@@ -21,3 +21,7 @@ Test instructions aren't labelled to save repetition, see ```/src/instructions.m
 
 ##### Misc
  - **0x6XNN**
+ - **0x8XY0**
+ - **0x8XY1**
+ - **0x8XY2**
+ - **0x8XY3**
