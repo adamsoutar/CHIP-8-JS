@@ -1,3 +1,4 @@
+const isNode = (typeof window === 'undefined')
 const font = [
   0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
   0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -82,28 +83,31 @@ class Chip8Core {
     this.drawFunction = drawFunction
     if (p) this.loadProgram(p)
 
-    // Add keymap listeners
-    document.addEventListener('keydown', (e) => {
-      for (let oK of Object.keys(keymap)) {
-        if (keymap[oK] === e.key.toUpperCase()) {
-          this.keystates[oK] = true
-          if (this.waitFlag) {
-            this.waitFlag = false
-            this.vR[this.keyWaitRegister] = parseInt(oK, 16)
-            this.start()
+    if (!isNode) {
+      // Add keymap listeners
+      document.addEventListener('keydown', (e) => {
+        for (let oK of Object.keys(keymap)) {
+          if (keymap[oK] === e.key.toUpperCase()) {
+            this.keystates[oK] = true
+            if (this.waitFlag) {
+              this.waitFlag = false
+              this.vR[this.keyWaitRegister] = parseInt(oK, 16)
+              this.stopFlag = false
+              this.start()
+            }
+            return
           }
-          return
         }
-      }
-    })
-    document.addEventListener('keyup', (e) => {
-      for (let oK of Object.keys(keymap)) {
-        if (keymap[oK] === e.key.toUpperCase()) {
-          this.keystates[oK] = false
-          return
+      })
+      document.addEventListener('keyup', (e) => {
+        for (let oK of Object.keys(keymap)) {
+          if (keymap[oK] === e.key.toUpperCase()) {
+            this.keystates[oK] = false
+            return
+          }
         }
-      }
-    })
+      })
+    }
   }
 
   initialise () {
@@ -119,6 +123,7 @@ class Chip8Core {
     this.skipFlag = false
     this.waitFlag = false
     this.stopFlag = false
+    this.startedFlag = false
     this.drawFlag = false
     this.keyWaitRegister = 0
 
@@ -134,12 +139,27 @@ class Chip8Core {
     this.initialiseGraphics()
   }
 
-  start () {
+  runTimers () {
     this.timerTimer = setInterval(() => {
       // Do registers
       if (this.soundTimer > 0) this.soundTimer--
       if (this.delayTimer > 0) this.delayTimer--
     }, 16)
+  }
+
+  runToEndSync () {
+    /* This is mostly just for tests, it doesn't work with most programs */
+    this.runTimers()
+    // While there is data at this memory address
+    while (Object.keys(this.memory).includes(String(this.pC))) {
+      this.doCycle()
+    }
+  }
+
+  start () {
+    this.runTimers()
+    if (this.startedFlag) return
+    this.startedFlag = true
 
     let core = this
     window.requestAnimationFrame(function nextFrame () {
@@ -147,7 +167,10 @@ class Chip8Core {
         if (!core.stopFlag) core.doCycle()
       }
 
-      if (core.drawFlag) core.drawFunction(core.gfx)
+      if (core.drawFlag) {
+        core.drawFlag = false
+        core.drawFunction(core.gfx)
+      }
 
       window.requestAnimationFrame(nextFrame)
     })
@@ -160,6 +183,7 @@ class Chip8Core {
 
   initialiseGraphics () {
     // Fill screen with 0s
+    this.gfx = []
     for (let y = 0; y < 32; y++) {
       let row = []
       for (let x = 0; x < 64; x++) {
@@ -176,6 +200,7 @@ class Chip8Core {
     for (let i = 0; i < p.length; i++) {
       this.memory[0x200 + i] = Number(p[i])
     }
+    return this
   }
 
   drawSprite (x, y, n) {
@@ -235,7 +260,7 @@ class Chip8Core {
       debugger
     }
 
-    console.log(`DEBUG - ${this.pC} - ${numToInstruction(instruction)}`)
+    // console.log(`DEBUG - ${this.pC} - ${numToInstruction(instruction)}`)
 
     switch (opcode) {
       case 0:
@@ -424,5 +449,8 @@ class Chip8Core {
     this.pC += 2
   }
 }
-
-window.Chip8Core = Chip8Core
+if (!isNode) {
+  window.Chip8Core = Chip8Core
+} else {
+  module.exports = Chip8Core
+}
