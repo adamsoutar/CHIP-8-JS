@@ -355,6 +355,9 @@ class Chip8Core {
           case 0xE:
             this.vR[0xF] = (vX & 0x80) >> 7
             this.vR[x] <<= 1
+            // Modern CPUs aren't 8bit, we have to simulate
+            // bits falling off the left
+            if (this.vR[x] > 255) this.vR[x] -= 256
             break
         }
         break
