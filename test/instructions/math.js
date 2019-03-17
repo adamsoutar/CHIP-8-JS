@@ -92,4 +92,22 @@ module.exports = (core) => {
     assert(core.vR[0] === 250)
     assert(core.vR[0xF] === 0)
   })
+
+  it('0x8XYE', function () {
+    core.loadProgram([
+      0x60, 0b00110101,
+      0x80, 0x0E
+    ]).runToEndSync()
+
+    assert(core.vR[0] === 0b1101010)
+    assert(core.vR[0xF] === 0)
+    
+    core.loadProgram([
+      0x60, 0b10110101,
+      0x80, 0x0E
+    ]).runToEndSync()
+
+    assert(core.vR[0] === 0b1101010)
+    assert(core.vR[0xF] === 1)
+  })
 }
