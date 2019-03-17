@@ -87,4 +87,19 @@ module.exports = (core) => {
     ]).runToEndSync()
     assert(core.soundTimer === 30)
   })
+
+  it('0xFX55 & 0xFX65', function () {
+    core.loadProgram([
+      0xA0, 10,
+      0x60, 1,
+      0x61, 2,
+      0x62, 3,
+      0xF2, 0x55,
+      0xF2, 0x65
+    ]).runToEndSync()
+
+    assert(core.memory[core.iR] === 1)
+    assert(core.memory[core.iR + 1] === 2)
+    assert(core.memory[core.iR + 2] === 3)
+  })
 }

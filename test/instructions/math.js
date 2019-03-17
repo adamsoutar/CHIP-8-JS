@@ -101,7 +101,7 @@ module.exports = (core) => {
 
     assert(core.vR[0] === 0b1101010)
     assert(core.vR[0xF] === 0)
-    
+
     core.loadProgram([
       0x60, 0b10110101,
       0x80, 0x0E
@@ -109,5 +109,17 @@ module.exports = (core) => {
 
     assert(core.vR[0] === 0b1101010)
     assert(core.vR[0xF] === 1)
+  })
+
+  it('0xFX33', function () {
+    core.loadProgram([
+      0xA0, 2,
+      0x60, 123,
+      0xF0, 0x33
+    ]).runToEndSync()
+
+    assert(core.memory[core.iR] === 1)
+    assert(core.memory[core.iR + 1] === 2)
+    assert(core.memory[core.iR + 2] === 3)
   })
 }
