@@ -47,12 +47,31 @@ module.exports = (core) => {
 
     // Check carry bit
     core.loadProgram([
-      0x60, 0,
       0x61, 5,
       0x80, 0x15
     ]).runToEndSync()
 
     assert(core.vR[0] === 250)
+    assert(core.vR[0xF] === 0)
+  })
+
+  it('0x8XY7', function () {
+    core.loadProgram([
+      0x60, 0b10110101,
+      0x80, 0x07
+    ]).runToEndSync()
+    console.log(core.vR[0])
+    assert(core.vR[0] === 0b1011010)
+    assert(core.vR[0xF] === 1)
+
+    console.log('First test passed')
+
+    core.loadProgram([
+      0x60, 0b10110100,
+      0x80, 7
+    ]).runToEndSync()
+
+    assert(core.vR[0] === 0b1011010)
     assert(core.vR[0xF] === 0)
   })
 }
