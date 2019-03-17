@@ -42,7 +42,7 @@ module.exports = (core) => {
     core.loadProgram([
       0x60, 0b00101001,
       0x61, 0b10110101,
-      0x80, 0x12
+      0x80, 0x13
     ]).runToEndSync()
 
     assert(core.vR[0] === 0b10011100)
