@@ -55,7 +55,7 @@ module.exports = (core) => {
       0xA0, 5,
       0xF0, 0x1E
     ]).runToEndSync()
-    
+
     assert(core.iR === 25)
   })
 
