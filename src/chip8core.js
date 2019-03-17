@@ -98,7 +98,7 @@ class Chip8Core {
     })
     document.addEventListener('keyup', (e) => {
       for (let oK of Object.keys(keymap)) {
-        if (keymap[oK] === e.key) {
+        if (keymap[oK] === e.key.toUpperCase()) {
           this.keystates[oK] = false
           return
         }
@@ -118,6 +118,8 @@ class Chip8Core {
     this.soundTimer = 0
     this.skipFlag = false
     this.waitFlag = false
+    this.stopFlag = false
+    this.drawFlag = false
     this.keyWaitRegister = 0
 
     for (let i = 0; i < 16; i++) {
@@ -138,14 +140,22 @@ class Chip8Core {
       if (this.soundTimer > 0) this.soundTimer--
       if (this.delayTimer > 0) this.delayTimer--
     }, 16)
-    this.cycleTimer = setInterval(() => {
-      this.doCycle()
-    }, 0)
+
+    let core = this
+    window.requestAnimationFrame(function nextFrame () {
+      for (let i = 0; i < 10; i++) {
+        if (!core.stopFlag) core.doCycle()
+      }
+
+      if (core.drawFlag) core.drawFunction(core.gfx)
+
+      window.requestAnimationFrame(nextFrame)
+    })
   }
 
   stop () {
     clearInterval(this.timerTimer)
-    clearInterval(this.cycleTimer)
+    this.stopFlag = true
   }
 
   initialiseGraphics () {
@@ -157,7 +167,7 @@ class Chip8Core {
       }
       this.gfx.push(row)
     }
-    this.drawFunction(this.gfx)
+    this.drawFlag = true
   }
 
   loadProgram (p) {
@@ -169,6 +179,7 @@ class Chip8Core {
   }
 
   drawSprite (x, y, n) {
+    this.vR[0xF] = 0
     for (let r = 0; r < n; r++) {
       for (let c = 0; c < 8; c++) {
         let newVal = getAlong(this.memory[this.iR + r], c)
@@ -192,7 +203,7 @@ class Chip8Core {
         this.gfx[yAddr][xAddr] = newVal ^ oldVal
       }
     }
-    this.drawFunction(this.gfx)
+    this.drawFlag = true
   }
 
   doCycle () {
@@ -224,7 +235,7 @@ class Chip8Core {
       debugger
     }
 
-    // console.log(`DEBUG - ${this.pC} - ${numToInstruction(instruction)}`)
+    console.log(`DEBUG - ${this.pC} - ${numToInstruction(instruction)}`)
 
     switch (opcode) {
       case 0:
@@ -289,13 +300,13 @@ class Chip8Core {
             this.vR[x] = vY
             break
           case 1:
-            this.vR[x] = vX | vY
+            this.vR[x] = (vX | vY)
             break
           case 2:
-            this.vR[x] = vX & vY
+            this.vR[x] = (vX & vY)
             break
           case 3:
-            this.vR[x] = vX ^ vY
+            this.vR[x] = (vX ^ vY)
             break
           case 4:
             this.vR[x] = add8bit(vX, vY)
@@ -305,16 +316,16 @@ class Chip8Core {
           case 5:
             this.vR[x] = sub8bit(vX, vY)
             // Carry flag
-            this.vR[0xF] = (vX - vY < 0) ? 0 : 1
+            this.vR[0xF] = (vX > vY) ? 1 : 0
             break
           case 6:
-            this.vR[0xF] = vX & 0x1
+            this.vR[0xF] = (vX & 0x1)
             this.vR[x] >>= 1
             break
           case 7:
             this.vR[x] = sub8bit(vY, vX)
             // Carry flag
-            this.vR[0xF] = (vY - vX < 0) ? 0 : 1
+            this.vR[0xF] = (vY > vX) ? 1 : 0
             break
           case 0xE:
             this.vR[0xF] = (vX & 0x80) >> 7
