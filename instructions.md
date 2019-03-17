@@ -20,7 +20,7 @@
  - **0x8XY4** - ✅ - Set V[X] to V[X] + V[Y] and update carry bit
  - **0x8XY5** - ✅ - Set V[X] to V[X] - V[Y] and update carry bit
  - **0x8X06** - ✅ - Set VF to V[X]'s least significant bit, then right shift V[X]
- - **0x8XY7** - ❌ - Set V[X] to V[Y] - V[X]
+ - **0x8XY7** - ✅ - Set V[X] to V[Y] - V[X]
  - **0x8XYE** - ❌ - Set VF to V[X]'s most significant bit, then left shift V[X]
  - **0x9XY0** - ❌ - Skip if V[X] != V[Y]
  - **0xANNN** - ❌ - Set I to NNN
