@@ -47,4 +47,13 @@ module.exports = (core) => {
 
     assert(core.vR[0] === 0b10011100)
   })
+
+  it('0xANNN', function () {
+    // `This test is slick ${(175).toString(16).toUpperCase()}`
+    core.loadProgram([
+      0xAF, 0xFF
+    ]).runToEndSync()
+
+    assert(core.iR === 0xFFF)
+  })
 }

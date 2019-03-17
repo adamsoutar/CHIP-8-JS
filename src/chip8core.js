@@ -154,6 +154,7 @@ class Chip8Core {
     while (Object.keys(this.memory).includes(String(this.pC))) {
       this.doCycle()
     }
+    clearInterval(this.timerTimer)
   }
 
   start () {

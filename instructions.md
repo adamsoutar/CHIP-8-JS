@@ -22,9 +22,9 @@
  - **0x8X06** - ✅ - Set VF to V[X]'s least significant bit, then right shift V[X]
  - **0x8XY7** - ✅ - Set V[X] to V[Y] - V[X]
  - **0x8XYE** - ✅ - Set VF to V[X]'s most significant bit, then left shift V[X]
- - **0x9XY0** - ❌ - Skip if V[X] != V[Y]
- - **0xANNN** - ❌ - Set I to NNN
- - **0xBNNN** - ❌ - Jump to NNN + V0
+ - **0x9XY0** - ✅ - Skip if V[X] != V[Y]
+ - **0xANNN** - ✅ - Set I to NNN
+ - **0xBNNN** - ✅ - Jump to NNN + V0
  - **0xCXNN** - ❌ - V[X] = rand(0, 255) AND NN
  - **0xFX07** - ❌ - V[X] = delay timer
  - **0xFX15** - ❌ - delay timer = V[X]
@@ -39,9 +39,11 @@
  - **0xEXA1** - ❌ - Skip if key in V[X] isn't pressed
  - **0xFX0A** - ❌ - Halt until a key is pressed, then store it in V[X]
 
-### TODO (1/35)
+### Unsupported (1/35)
 
  - **0x0NNN** Call RCA1802 program at NNN (What does that mean?)
+
+ Note: This command is ignored by, as far as I know, all modern CHIP 8 interpreters. It involves executing bare metal assembler instructions on the 70s CPUs that originally ran the interpreters. It's not realistically implementable on modern hardware.
 
 
 https://en.wikipedia.org/wiki/CHIP-8

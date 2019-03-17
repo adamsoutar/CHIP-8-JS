@@ -26,7 +26,7 @@ module.exports = (core) => {
     assert(core.vR[2] === 0xFF)
     assert(core.vR[3] === 0)
   })
-  
+
   it('0x3XNN', function () {
     core.loadProgram([
       0x61, 0x02,
@@ -63,5 +63,31 @@ module.exports = (core) => {
 
     assert(core.vR[3] === 0)
     assert(core.vR[4] === 1)
+  })
+
+  it('0x9XY0', function () {
+    core.loadProgram([
+      0x61, 1,
+      0x62, 1,
+      0x91, 0x20,
+      0x61, 2,
+      0x91, 0x20,
+      0x63, 1
+    ]).runToEndSync()
+
+    assert(core.vR[3] === 0)
+    assert(core.vR[2] === 1)
+    assert(core.vR[1] === 2)
+  })
+
+  it('0xBNNN', function () {
+    core.loadProgram([
+      0x60, 0x06,
+      0xB2, 0x00,
+      0x61, 0x01
+    ]).runToEndSync()
+console.log(core.vR[0])
+    assert(core.vR[1] === 0)
+    assert(core.pC === 0x206)
   })
 }
