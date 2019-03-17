@@ -12,7 +12,7 @@ module.exports = (core) => {
     assert(screen = core.gfx)
   })
 
-  it('0xDXYN', function () {
+  it('0xDXYN & 0xFX29', function () {
     core.loadProgram([
       0x60, 0x09,
       0xF0, 0x29,

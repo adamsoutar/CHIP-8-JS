@@ -48,13 +48,15 @@ module.exports = (core) => {
     assert(core.vR[0] === 0b10011100)
   })
 
-  it('0xANNN', function () {
+  it('0xANNN & 0xFX1E', function () {
     // `This test is slick ${(175).toString(16).toUpperCase()}`
     core.loadProgram([
-      0xAF, 0xFF
+      0x60, 20,
+      0xA0, 5,
+      0xF0, 0x1E
     ]).runToEndSync()
-
-    assert(core.iR === 0xFFF)
+    
+    assert(core.iR === 25)
   })
 
   it('0xCXNN', function () {
@@ -76,5 +78,13 @@ module.exports = (core) => {
 
     assert(core.vR[0] === 0)
     assert(core.vR[2] === 30)
+  })
+
+  it('0xFX18', function () {
+    core.loadProgram([
+      0x60, 30,
+      0xF0, 0x18
+    ]).runToEndSync()
+    assert(core.soundTimer === 30)
   })
 }

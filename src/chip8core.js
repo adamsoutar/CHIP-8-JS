@@ -368,7 +368,8 @@ class Chip8Core {
         if (this.vR[x2] !== this.vR[y2]) this.skipFlag = true
         break
       case 0xA:
-        this.iR = instruction & 0x0FFF
+        this.iR = (instruction & 0x0FFF)
+        console.log(this.iR)
         break
       case 0xB:
         this.pC = -2 + (instruction & 0x0FFF) + this.vR[0]
@@ -413,7 +414,10 @@ class Chip8Core {
             this.soundTimer = this.vR[x4]
             break
           case 0x1E:
+            console.log(this.iR)
+            console.log(x4)
             this.iR += this.vR[x4]
+            console.log(this.iR)
             while (this.iR > 65535) this.iR -= 65535
             break
           case 0x29:
