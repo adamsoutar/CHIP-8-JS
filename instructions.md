@@ -30,13 +30,13 @@
  - **0xFX15** - ✅ - delay timer = V[X]
  - **0xFX18** - ✅ - sound timer = V[X]
  - **0xFX1E** - ✅ - Add V[X] to i
- - **0xFX55** - ❌ - Copy V0 to V[X] (inc) into i onwards
- - **0xFX65** - ❌ - Copy i to i + X into V0 onwards
+ - **0xFX55** - ✅ - Copy V0 to V[X] (inc) into i onwards
+ - **0xFX65** - ✅ - Copy i to i + X into V0 onwards
  - **0xDXYN** - ✅ - Draw 8xN sprite at X Y from I
  - **0xFX29** - ✅ - Set I to font set location for char in V[X]
- - **0xFX33** - ❌ - V[X] hundreds column to i, tens to i + 1, units to i + 2
- - **0xEX9E** - ❌ - Skip if key in V[X] is pressed
- - **0xEXA1** - ❌ - Skip if key in V[X] isn't pressed
+ - **0xFX33** - ✅ - V[X] hundreds column to i, tens to i + 1, units to i + 2
+ - **0xEX9E** - ✅ - Skip if key in V[X] is pressed
+ - **0xEXA1** - ✅ - Skip if key in V[X] isn't pressed
  - **0xFX0A** - ❌ - Halt until a key is pressed, then store it in V[X]
 
 ### Unsupported (1/35)

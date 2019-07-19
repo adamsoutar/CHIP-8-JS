@@ -388,7 +388,8 @@ class Chip8Core {
       case 0xE:
         let end2 = instruction & 0x00FF
         let x6 = (instruction & 0x0F00) >> 8
-        let key = this.keystates[this.vR[x6]]
+        let key = this.keystates[(this.vR[x6]).toString(16).toUpperCase()]
+
         switch (end2) {
           case 0x9E:
             if (key) this.skipFlag = true

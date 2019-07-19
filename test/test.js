@@ -13,4 +13,5 @@ describe('Instructions', function () {
   importTest('Drawing', './instructions/drawing.js')
   importTest('Jumps', './instructions/jumps.js')
   importTest('Misc', './instructions/misc.js')
+  importTest('Keys', './instructions/keys.js')
 })
