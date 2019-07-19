@@ -15,6 +15,6 @@
     "standard": "^12.0.1"
   },
   "dependencies": {
-    "mocha": "^6.0.2"
+    "mocha": "^6.2.0"
   }
 }
