@@ -49,13 +49,12 @@ function getAlong (num, along) {
 
 function add8bit (a, b) {
   let c = a + b
-  while (c > 255) c -= 255
-  return c
+  return c & 0xFF
 }
 
 function sub8bit (a, b) {
   let c = a - b
-  while (c < 0) c += 255
+  while (c < 0) c += 256
   return c
 }
 

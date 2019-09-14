@@ -4,7 +4,7 @@
   "description": "A CHIP-8 emulator in JavaScript",
   "main": "index.js",
   "scripts": {
-    "test": "standard"
+    "test": "mocha && standard"
   },
   "keywords": [
     "chip-8"
